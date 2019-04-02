@@ -1,9 +1,9 @@
 <template>
     <div class="container">
         <div class="toggles">
-            <button v-on:click="toggleShowFq" v-bind:class={on:showfq}>{{ showfq ? "Hide" : "Show"}} Frequencies</button>
-            <button v-on:click="toggleShowOv" v-bind:class={on:showov}>{{ showov ? "Hide" : "Show"}} Octave Select</button>
-            <button v-on:click="toggleShowWf" v-bind:class={on:showwf}>{{ showwf ? "Hide" : "Show"}} Waveform Select</button>
+            <ToggleButton v-model="showfq">Frequencies</ToggleButton>
+            <ToggleButton v-model="showov">Octave Select</ToggleButton>
+            <ToggleButton v-model="showwf">Waveform Select</ToggleButton>
         </div>
         <div class="keyboard">
             <Key v-for="key in keys" v-bind:key="key.id"
@@ -14,19 +14,8 @@
                 v-bind="key"/>
         </div>
         <div class="controls">
-            <div v-if="showov">
-                <label>Octave:</label>
-                <div class="spinner">
-                    <button v-on:click="octaveDn">-</button>
-                    <span>{{ octave }}</span>
-                    <button v-on:click="octaveUp">+</button>
-                </div>
-            </div>
-            <div>
-                <label>Volume:</label>
-                <input class="slider" type="range" min="0" max=".2" step="0.001" v-model.number="volume"/>
-                <span class="volPerc">{{ Math.floor(volume*500) + "%" }}</span>
-            </div>
+            <Spinner v-if="showov" v-model="octave" :min="0" :max="8" label="Octave"/>
+            <Slider v-model="volume" :min="0" :max="0.2" :step="0.01" label="Volume"/>
             <div v-if="showwf">
                 <label>Waveform:</label>
                 <select v-model="wavefm">
@@ -37,14 +26,30 @@
                 </select>
             </div>
         </div>
+        <div class="userChoices">
+            <BigButton :disabled="!keyPlayed" :click="keyWorks" title="This key works" subtitle="I can hear the tone" />
+            <BigButton :disabled="!keyPlayed" :click="keyBroke" title="This key is broken" subtitle="I cannot hear the tone" />
+        </div>
     </div>
 </template>
 
 <script>
+import BigButton from './BigButton.vue'
 import Key from './Key.vue'
+import Slider from './Slider.vue'
+import Spinner from './Spinner.vue'
+import ToggleButton from './ToggleButton.vue'
+
 
 export default {
     name: "Piano",
+    components: {
+        BigButton,
+        Key,
+        Slider,
+        Spinner,
+        ToggleButton
+    },
     data() {
         return {
             octave: 4,
@@ -54,7 +59,9 @@ export default {
             showwf: false,
             showov: false,
             numKeys: 24,
-            optionSelected: false
+            keyPlayed: false,
+            choiceMade: false,
+            activeKey: {}
         }
     },
     computed: {
@@ -77,29 +84,17 @@ export default {
         }
     },
     methods: {
-        toggleShowFq: function() {
-            this.showfq = !this.showfq;
+        keyWorks: function() {
+
         },
-        toggleShowWf: function() {
-            this.showwf = !this.showwf; 
-        },
-        toggleShowOv: function() {
-            this.showov = !this.showov; 
-        },
-        octaveUp: function() {
-            if (this.octave < 8) this.octave++;
-        },
-        octaveDn: function() {
-            if (this.octave > 0) this.octave--;
+        keyBroke: function() {
+
         }
-    },
-    components: {
-        Key
     }
 }
 </script>
 
-<style scoped>
+<style>
 .container {
     display: flex;
     flex-direction: column;
@@ -109,24 +104,6 @@ export default {
 }
 .toggles {
     margin-bottom: 1em;
-}
-.toggles button {
-    background: #eee;
-    border: 1px solid #ccc;
-    width: 12em;
-    line-height: 2em;
-    margin: .1em;
-    opacity: .7;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
-}
-.toggles button:hover {
-    opacity: 1;
-}
-.toggles button.on {
-    background: #35e;
-    border-color: #46f;
-    color: white;
 }
 .keyboard {
     display: flex;
@@ -145,84 +122,21 @@ export default {
     line-height: 1em;
     display: inline-block;
     font-size: 16px;
-    padding-top: 1em;
-    padding-bottom: 1em;
 }
 .controls label {
-    padding-right: 1em;
-}
-.spinner {
-    display: inline-block;
-    padding-right: 2em;
-}
-.spinner span,
-.spinner button {
-    border: 1px solid black;
-    padding: 1em;
-}
-.spinner button {
-    border-left-color: #46f;
-    border-right-color: #46f;
-    background: #35e;
-    opacity: .7;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
-}
-.spinner button:hover {
-    opacity: 1;
-}
-.spinner button:first-child {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-.spinner button:last-child {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-}
-.slider {
-    -webkit-appearance: none;  /* Override default CSS styles */
-    appearance: none;
-    background: #d3d3d3;
-    border-radius: 1em;
-    outline: none;
-
-    width: 10em;
-    height: 1em;
-    margin-top: 1em;
-    margin-bottom: 1em;
-    opacity: 0.7; 
-    -webkit-transition: .2s;
-    transition: opacity .2s;
-
-    cursor: pointer;
-}
-.slider:hover {
-    opacity: 1;
-}
-.slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    background: #35e;
-    border-radius: 50%;
-    width: 2em;
-    height: 2em;
-    cursor: pointer;
-}
-.slider::-moz-range-thumb {
-    background: #35e;
-    border-radius: 50%;
-    width: 2em;
-    height: 2em;
-    cursor: pointer;
-}
-.controls .volPerc {
-    width: 3em; 
-    text-align: center;
-    padding-left: .5em;
-    padding-right: 2em;
+    margin-left: 1em;
+    margin-right: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 .controls select {
     padding: 1em;
     line-height: 1em;
+}
+.userChoices {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: .5em 2em;
 }
 </style>
