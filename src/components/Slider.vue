@@ -30,10 +30,10 @@ export default {
     border-radius: 1em;
     outline: none;
 
-    width: 10em;
-    height: 1em;
-    margin-top: 1em;
-    margin-bottom: 1em;
+    width: 8em;
+    height: .8em;
+    margin-top: 1.1em;
+    margin-bottom: 1.1em;
     opacity: 0.7; 
     -webkit-transition: .2s;
     transition: opacity .2s;
@@ -48,15 +48,15 @@ export default {
     appearance: none;
     background: #35e;
     border-radius: 50%;
-    width: 2em;
-    height: 2em;
+    width: 1.5em;
+    height: 1.5em;
     cursor: pointer;
 }
 .slider input::-moz-range-thumb {
     background: #35e;
     border-radius: 50%;
-    width: 2em;
-    height: 2em;
+    width: 1.5em;
+    height: 1.5em;
     cursor: pointer;
 }
 .slider .percent {

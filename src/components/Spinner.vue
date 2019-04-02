@@ -36,20 +36,18 @@ export default {
 <style scoped>
 .spinner {
     display: inline-block;
-    padding-right: 2em;
 }
 .spinner .wrapper {
     display: inline-block;
     vertical-align: middle;
+    margin-right: 1em;
 }
 .spinner span,
 .spinner button {
     border: 1px solid black;
-    padding: 1em;
+    padding: .8em;
 }
 .spinner button {
-    border-left-color: #46f;
-    border-right-color: #46f;
     background: #35e;
     opacity: .7;
     -webkit-transition: .2s;
@@ -59,10 +57,14 @@ export default {
     opacity: 1;
 }
 .spinner .wrapper button:first-child {
+    border-right: none;
+    border-left-color: #13c;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
 }
 .spinner .wrapper button:last-child {
+    border-left: none;
+    border-right-color: #13c;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
