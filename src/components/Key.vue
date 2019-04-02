@@ -1,5 +1,5 @@
 <template>
-    <div v-bind:class="[isBlackKey ? 'bkey' : 'wkey']"
+    <div v-bind:class="[isBlackKey ? 'bkey' : 'wkey', active ? 'active' : '']"
         v-on:mousedown="onmousedown"
         v-on:mouseup="onmouseup">
         <span v-if="showfq">{{ Math.floor(frequency*100)/100 }}</span>
@@ -30,10 +30,6 @@ export default {
         keyNum: Number, 
         dudKey: Boolean, 
         active: Boolean,
-        shared: Object,
-    },
-    data() {
-        return this.shared;
     },
     computed: {
         id: function() { return keyNames[this.keyNum>=0 ? this.keyNum%12 : 12+this.keyNum] + this.octave; },
@@ -42,12 +38,13 @@ export default {
     },
     methods: {
         onmousedown: function() {
-            if (this.active && !this.dudKey) {
-                oscNode.type = this.wavefm;
-                oscNode.frequency.setValueAtTime(this.frequency, audioCtx.currentTime);
-                gainNode.gain.setValueAtTime(+this.volume, audioCtx.currentTime);
-                this.shared.played = true;
-                console.log(this.volume);
+            if (this.active) {
+                if (!this.dudKey) {
+                    oscNode.type = this.wavefm;
+                    oscNode.frequency.setValueAtTime(this.frequency, audioCtx.currentTime);
+                    gainNode.gain.setValueAtTime(+this.volume, audioCtx.currentTime);
+                }
+                this.$emit("played", this.keyNum);
             }
         },
         onmouseup: function() {
@@ -63,14 +60,20 @@ export default {
     vertical-align: top;
     overflow: auto;
     position: relative;
-    cursor: pointer;
+    cursor: default;
     -webkit-transition: .2s; /* 0.2 seconds transition on hover */
     transition: background-color .2s;
 }
 
-.wkey:hover,
-.bkey:hover {
+.wkey.active:hover,
+.bkey.active:hover {
     background: orange;
+}
+
+.wkey.active,
+.bkey.active {
+    background: #ffc250;
+    cursor: pointer;
 }
 
 .wkey {

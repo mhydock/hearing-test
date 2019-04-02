@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <button v-on:click="start">Start</button>
         <div class="toggles">
             <ToggleButton v-model="showfq">Frequencies</ToggleButton>
             <ToggleButton v-model="showov">Octave Select</ToggleButton>
@@ -11,7 +12,8 @@
                 v-bind:volume="volume"
                 v-bind:wavefm="wavefm"
                 v-bind:showfq="showfq"
-                v-bind="key"/>
+                v-bind="key"
+                v-on:played="played" />
         </div>
         <div class="controls">
             <Spinner v-if="showov" v-model="octave" :min="0" :max="8" label="Octave"/>
@@ -52,6 +54,7 @@ export default {
     },
     data() {
         return {
+            keys: [],
             octave: 4,
             volume: .2, // idk why, but vivaldi doesn't produce any audible difference beyond .2
             wavefm: "sine",
@@ -59,37 +62,68 @@ export default {
             showwf: false,
             showov: false,
             numKeys: 24,
-            keyPlayed: false,
             choiceMade: false,
-            activeKey: {}
+            keyIndex: -1
         }
     },
     computed: {
-        keys: function () {
-            var keys = [];
+        activeKey: function() {
+            if (this.keyIndex < this.keys.length && this.indexes) {
+                return this.keys[this.indexes[this.keyIndex]];
+            }
+            return null;            
+        },
+        keyPlayed: function() {
+            return this.activeKey ? this.activeKey.played : false;
+        }
+    },
+    watch: {
+        numKeys: function() {
+            this.genKeys();
+        }
+    },
+    methods: {
+        start: function () {
+            this.indexes = Array(this.keys.length);
+            for (var i = 0; i < this.indexes.length; i++) this.indexes[i] = i;
+            this.indexes.sort(() => { return 0.5 - Math.random(); });
+
+            this.keyIndex = 0;
+            this.keys[this.indexes[this.keyIndex]].active = true;
+        },
+        played: function() {
+            this.activeKey.played = true;
+        },
+        keyWorks: function() {
+            this.activeKey.broken = false;
+            this.nextKey();
+        },
+        keyBroke: function() {
+            this.activeKey.broken = true;
+            this.nextKey();
+        },
+        nextKey: function() {
+            console.log(this.activeKey);
+            if (this.activeKey) this.activeKey.active = false;
+            this.keyIndex++;
+            if (this.activeKey) this.activeKey.active = true;
+        },
+        genKeys: function() {
             for (var i = 0; i < this.numKeys; i++) {
                 const k = i-4;
                 const key = {
                     keyNum: k,
                     dudKey: Math.random() < 0.1,
-                    active: true,
-                    shared: {
-                        played: false,
-                        needsTuning: false,
-                    }
+                    active: false,
+                    played: false,
+                    broken: false,
                 };
-                keys.push(key);
+                this.keys.push(key);
             }
-            return keys;
         }
     },
-    methods: {
-        keyWorks: function() {
-
-        },
-        keyBroke: function() {
-
-        }
+    created: function() {
+        this.genKeys();
     }
 }
 </script>
@@ -117,10 +151,13 @@ export default {
     display: inline-block;
 }
 .controls span,
+.controls input,
 .controls label, 
-.controls button {
+.controls button,
+.controls select {
     line-height: 1em;
     display: inline-block;
+    vertical-align: middle;
     font-size: 16px;
 }
 .controls label {
@@ -130,8 +167,9 @@ export default {
     padding-bottom: 1em;
 }
 .controls select {
-    padding: 1em;
+    padding: .8em;
     line-height: 1em;
+    margin-right: 1em;
 }
 .userChoices {
     display: flex;
