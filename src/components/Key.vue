@@ -2,7 +2,11 @@
     <div v-bind:class="[isBlackKey ? 'bkey' : 'wkey', active ? 'active' : '']"
         v-on:mousedown="onmousedown"
         v-on:mouseup="onmouseup">
-        <span v-if="showfq">{{ Math.floor(frequency*100)/100 }}</span>
+        <span class="freq" v-if="showfq">{{ Math.floor(frequency*100)/100 }}</span>
+        <span v-bind:class="['res', result ? 'right' : 'wrong']" v-if="showrs">
+            {{ result ? "&#x2714;" : "&#x2718;" }}
+        </span>
+
     </div>
 </template>
 
@@ -27,14 +31,17 @@ export default {
         volume: Number,
         wavefm: String,
         showfq: Boolean,
+        showrs: Boolean,
         keyNum: Number, 
         dudKey: Boolean, 
         active: Boolean,
+        broken: Boolean,
     },
     computed: {
         id: function() { return keyNames[this.keyNum>=0 ? this.keyNum%12 : 12+this.keyNum] + this.octave; },
         isBlackKey: function () { return this.id.includes('#'); },
         frequency: function() { return Math.pow(2, this.keyNum/12) * Math.pow(2, this.octave-4) * 440; },
+        result: function() { return this.dudKey == this.broken; }
     },
     methods: {
         onmousedown: function() {
@@ -63,6 +70,7 @@ export default {
     cursor: default;
     -webkit-transition: .2s; /* 0.2 seconds transition on hover */
     transition: background-color .2s;
+    font-size: 16px;
 }
 
 .wkey.active:hover,
@@ -84,16 +92,16 @@ export default {
 }
 
 .bkey {
+    border: 1px solid black;
     background: black;
     width: 2em;
     height: 8em;
-    margin-left: -1em;
-    margin-right: -1em;
+    margin-left: -1.0625em;
+    margin-right: -1.0625em;
     z-index: 1000;
 }
 
-.wkey > span,
-.bkey > span {
+.freq {
     display: block;
     transform: rotate(-90deg);
     transform-origin: center center 0;
@@ -104,12 +112,38 @@ export default {
     bottom: 1em;
 }
 
-.wkey > span {
+.wkey .freq {
     line-height: 3em;
 }
 
-.bkey > span {
+.bkey .freq {
     line-height: 2em;
     color: white;
+}
+
+.res {
+    display: block;
+    text-align: center;
+    line-height: 1em;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1em;
+}
+
+.wkey .res {
+    top: 12em;
+}
+
+.bkey .res {
+    top: 6em;
+}
+
+.res.right {
+    color: green;
+}
+
+.res.wrong {
+    color: red;
 }
 </style>

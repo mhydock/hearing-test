@@ -23,6 +23,7 @@ button {
     opacity: .7;
     -webkit-transition: .2s;
     transition: opacity .2s;
+    cursor: pointer;
 }
 button:hover {
     opacity: 1;

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <button v-on:click="start">Start</button>
+        <button class="start" v-on:click="start">&#x2BC8;</button>
         <div class="toggles">
             <ToggleButton v-model="showfq">Frequencies</ToggleButton>
             <ToggleButton v-model="showov">Octave Select</ToggleButton>
@@ -12,6 +12,7 @@
                 v-bind:volume="volume"
                 v-bind:wavefm="wavefm"
                 v-bind:showfq="showfq"
+                v-bind:showrs="showrs"
                 v-bind="key"
                 v-on:played="played" />
         </div>
@@ -42,6 +43,7 @@ import Slider from './Slider.vue'
 import Spinner from './Spinner.vue'
 import ToggleButton from './ToggleButton.vue'
 
+const PERC_DUD = 0.1;
 
 export default {
     name: "Piano",
@@ -61,6 +63,7 @@ export default {
             showfq: false,
             showwf: false,
             showov: false,
+            showrs: false,
             numKeys: 24,
             choiceMade: false,
             keyIndex: -1
@@ -90,6 +93,12 @@ export default {
 
             this.keyIndex = 0;
             this.keys[this.indexes[this.keyIndex]].active = true;
+            this.showrs = false;
+
+            for (var key of this.keys) {
+                key.broken = false;
+                key.dudKey = Math.random() < PERC_DUD;
+            }
         },
         played: function() {
             this.activeKey.played = true;
@@ -103,17 +112,19 @@ export default {
             this.nextKey();
         },
         nextKey: function() {
-            console.log(this.activeKey);
             if (this.activeKey) this.activeKey.active = false;
             this.keyIndex++;
             if (this.activeKey) this.activeKey.active = true;
+
+            if (this.keyIndex >= this.keys.length) 
+                this.showrs = true;
         },
         genKeys: function() {
             for (var i = 0; i < this.numKeys; i++) {
                 const k = i-4;
                 const key = {
                     keyNum: k,
-                    dudKey: Math.random() < 0.1,
+                    dudKey: Math.random() < PERC_DUD,
                     active: false,
                     played: false,
                     broken: false,
@@ -135,6 +146,23 @@ export default {
     justify-content: center;
     overflow: auto;
     width: auto;
+}
+.start {
+    border: 2px solid gray;
+    border-radius: 50%;
+    width: 3em;
+    height: 3em;
+    line-height: 1em;
+    padding: 1em;
+    margin: 1em auto;
+    font-size: 35px;
+    opacity: .7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    cursor: pointer;
+}
+.start:hover {
+    opacity: 1;
 }
 .toggles {
     margin-bottom: 1em;
