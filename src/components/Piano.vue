@@ -44,6 +44,7 @@ import Spinner from './Spinner.vue'
 import ToggleButton from './ToggleButton.vue'
 
 const PERC_DUD = 0.1;
+const OFFSET = 4;
 
 export default {
     name: "Piano",
@@ -96,12 +97,22 @@ export default {
             this.showrs = false;
 
             for (var key of this.keys) {
+                key.active = false;
                 key.broken = false;
                 key.dudKey = Math.random() < PERC_DUD;
             }
         },
-        played: function() {
-            this.activeKey.played = true;
+        played: function(id) {
+            if (id) {
+                if (this.activeKey) this.activeKey.active = false;
+
+                var index = id+OFFSET
+                this.keys[index].played = true;
+                this.keys[index].active = true;
+                this.keyIndex = this.indexes.indexOf(index);
+            } else {
+                this.activeKey.played = true;
+            }
         },
         keyWorks: function() {
             this.activeKey.broken = false;
@@ -112,6 +123,8 @@ export default {
             this.nextKey();
         },
         nextKey: function() {
+            if (this.showrs) return;
+
             if (this.activeKey) this.activeKey.active = false;
             this.keyIndex++;
             if (this.activeKey) this.activeKey.active = true;
@@ -121,7 +134,7 @@ export default {
         },
         genKeys: function() {
             for (var i = 0; i < this.numKeys; i++) {
-                const k = i-4;
+                const k = i-OFFSET;
                 const key = {
                     keyNum: k,
                     dudKey: Math.random() < PERC_DUD,

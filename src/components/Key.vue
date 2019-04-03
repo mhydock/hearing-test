@@ -45,13 +45,13 @@ export default {
     },
     methods: {
         onmousedown: function() {
-            if (this.active) {
+            if (this.active || this.showrs) {
                 if (!this.dudKey) {
                     oscNode.type = this.wavefm;
                     oscNode.frequency.setValueAtTime(this.frequency, audioCtx.currentTime);
                     gainNode.gain.setValueAtTime(+this.volume, audioCtx.currentTime);
                 }
-                this.$emit("played", this.keyNum);
+                this.$emit("played", this.showrs ? this.keyNum : null);
             }
         },
         onmouseup: function() {
