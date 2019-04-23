@@ -92,15 +92,15 @@ export default {
             for (var i = 0; i < this.indexes.length; i++) this.indexes[i] = i;
             this.indexes.sort(() => { return 0.5 - Math.random(); });
 
-            this.keyIndex = 0;
-            this.keys[this.indexes[this.keyIndex]].active = true;
-            this.showrs = false;
-
             for (var key of this.keys) {
                 key.active = false;
                 key.broken = false;
                 key.dudKey = Math.random() < PERC_DUD;
-            }
+            }            
+            
+            this.keyIndex = 0;
+            this.keys[this.indexes[this.keyIndex]].active = true;
+            this.showrs = false;
         },
         played: function(id) {
             if (id) {
